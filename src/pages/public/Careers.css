@@ -1,0 +1,218 @@
+.careers-hero {
+  padding: 8rem 0 4rem 0;
+  background: linear-gradient(to bottom, rgba(212, 175, 55, 0.05), transparent);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.careers-hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.careers-hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.culture-left-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.culture-highlights {
+  margin-top: 1.5rem;
+}
+
+.culture-highlight-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.highlight-big {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.culture-highlight-card h6 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.culture-highlight-card p {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Application Form */
+.careers-application-form-card {
+  background-color: var(--bg-secondary);
+}
+
+.careers-application-form-card .form-title {
+  font-size: 1.25rem;
+  color: var(--accent-gold);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.careers-application-form-card .form-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.application-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.resume-drop-zone {
+  border: 1px dashed var(--border-glass-hover);
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.resume-drop-zone:hover {
+  border-color: var(--accent-gold);
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.drop-zone-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.upload-progress-box {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background-color: var(--bg-primary);
+  border-radius: 3px;
+  margin-bottom: 0.4rem;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent-gold);
+  transition: width 0.3s ease;
+}
+
+.application-success {
+  padding: 2rem 1rem;
+}
+
+/* Job board filters */
+.job-filters-ribbon {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  background-color: var(--bg-secondary);
+  border-color: var(--border-glass-hover);
+}
+
+.job-filters-ribbon .filter-input-group.search {
+  flex: 2;
+}
+
+.job-filters-ribbon .filter-input-group {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-glass);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+}
+
+.filter-input-field, .filter-dropdown {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.filter-dropdown option {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Vertical job cards */
+.jobs-board-vertical-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.job-board-item-card {
+  padding: 2rem;
+}
+
+.job-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.job-item-header h4 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.job-meta-labels {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.job-meta-labels span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.job-item-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}

@@ -1,0 +1,13 @@
+export { default as Home } from './Home';
+export { default as About } from './About';
+export { default as PracticeAreas } from './PracticeAreas';
+export { default as PracticeAreaDetail } from './PracticeAreaDetail';
+export { default as LawyerDirectory } from './LawyerDirectory';
+export { default as LawyerDetail } from './LawyerDetail';
+export { default as CaseStudies } from './CaseStudies';
+export { default as CaseStudyDetail } from './CaseStudyDetail';
+export { default as KnowledgeCenter } from './KnowledgeCenter';
+export { default as ArticleDetail } from './ArticleDetail';
+export { default as Careers } from './Careers';
+export { default as Contact } from './Contact';
+export { default as LegalDocs } from './LegalDocs';

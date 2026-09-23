@@ -1,0 +1,888 @@
+.portal-login-page-container {
+  padding: 8rem 0;
+  background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 60%);
+}
+.flex-center {
+  display: flex;
+  justify-content: center;
+}
+.login-portal-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 3rem 2.5rem;
+}
+.lock-icon {
+  margin: 0 auto 1rem auto;
+}
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.login-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+.login-error-alert {
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid var(--color-error);
+  color: #ff6b6b;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.credentials-helper-tip {
+  margin-top: 2rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  font-size: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  line-height: 1.4;
+}
+.credentials-helper-tip code {
+  color: var(--accent-gold);
+  font-family: monospace;
+}
+
+/* Portal Header */
+.portal-header-banner {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-glass);
+  padding: 3rem 0;
+}
+
+.portal-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.portal-shield-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-error);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.portal-client-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-top: 0.25rem;
+}
+
+.portal-client-company {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Portal Navigation Tabs bar */
+.portal-nav-bar {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-glass);
+  position: sticky;
+  top: 80px;
+  z-index: 100;
+}
+
+.portal-tabs-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+}
+
+.portal-tab-btn {
+  padding: 1.25rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.portal-tab-btn.active, .portal-tab-btn:hover {
+  color: var(--accent-gold);
+  border-bottom-color: var(--accent-gold);
+}
+
+/* Workspace text */
+.workspace-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 0.25rem;
+}
+
+.workspace-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+/* Cases list tab */
+.portal-cases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.case-status-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.case-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.case-status-header h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.case-id-tag {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.case-status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.case-status-badge.active {
+  background: rgba(241, 196, 15, 0.15);
+  color: var(--color-warning);
+  border: 1px solid rgba(241, 196, 15, 0.3);
+}
+
+.case-status-badge.completed {
+  background: rgba(46, 204, 113, 0.15);
+  color: var(--color-success);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.case-attorney-row {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.case-progress-bar-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.case-progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: var(--bg-primary);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border-glass);
+}
+
+.case-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #b8931b 0%, var(--accent-gold) 100%);
+}
+
+.case-latest-updates {
+  border-top: 1px solid var(--border-glass);
+  padding-top: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.case-latest-updates p {
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* Docs tab uploader */
+.docs-workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.portal-uploader-inline-form {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--bg-secondary);
+}
+
+.portal-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-glass-hover);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-sm);
+}
+
+.upload-progress-percent {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.doc-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Billing invoice check */
+.status-badge-inline {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.status-badge-inline.paid {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: var(--color-success);
+  border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+.status-badge-inline.unpaid {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: var(--color-error);
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.btn-pay-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+/* Invoice checkout panel */
+.invoice-checkout-card {
+  max-width: 500px;
+  margin: 0 auto;
+  background-color: var(--bg-secondary);
+}
+
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 0.5rem;
+}
+
+.checkout-summary {
+  background-color: var(--bg-primary);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+}
+
+.checkout-credit-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Messages Chat client */
+.portal-messaging-workspace-card {
+  background-color: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  height: 480px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.portal-messages-log {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.portal-msg-row {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+}
+
+.portal-msg-row.outgoing {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.portal-msg-row.incoming {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.portal-msg-meta {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.portal-msg-body-bubble {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.portal-msg-row.outgoing .portal-msg-body-bubble {
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #a88518 100%);
+  color: #040814;
+  font-weight: 500;
+  border-top-right-radius: 0;
+}
+
+.portal-msg-row.incoming .portal-msg-body-bubble {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  border-top-left-radius: 0;
+}
+
+.portal-messaging-input-form {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-glass);
+}
+
+/* --- Profile & Security Modal & Tab Styles --- */
+.portal-profile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 20, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.portal-profile-modal {
+  width: 100%;
+  max-width: 580px;
+  background: #07172e;
+  border: 1px solid rgba(197, 168, 128, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.portal-profile-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.portal-profile-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.portal-profile-body {
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.portal-profile-details-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.portal-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .portal-profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Profile Details Card & High-Contrast WCAG AA Styling */
+.portal-profile-details-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg, 12px);
+  padding: 1.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.portal-profile-field label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #475569);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.portal-profile-field p {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-primary, #0a2342);
+  font-size: 1rem;
+  word-break: break-all;
+}
+
+[data-theme="dark"] .portal-profile-field p {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .portal-profile-field label {
+  color: #cbd5e1;
+}
+
+.portal-role-badge {
+  display: inline-block;
+  background: rgba(197, 168, 128, 0.2);
+  color: var(--accent-gold-text, #866635);
+  border: 1px solid rgba(197, 168, 128, 0.45);
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="dark"] .portal-role-badge {
+  color: #e6c89c;
+  background: rgba(197, 168, 128, 0.25);
+}
+
+.portal-section-divider {
+  border: none;
+  border-top: 1px solid var(--border-glass, rgba(10, 35, 66, 0.12));
+  margin: 1.75rem 0;
+}
+
+.portal-change-pass-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.15rem;
+  color: var(--text-primary, #0a2342);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+[data-theme="dark"] .portal-change-pass-title {
+  color: #f8fafc;
+}
+
+.portal-change-pass-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #475569);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+[data-theme="dark"] .portal-change-pass-desc {
+  color: #94a3b8;
+}
+
+.portal-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.portal-password-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.portal-password-form .form-label {
+  font-size: 0.875rem;
+  color: var(--text-primary, #0f172a);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .portal-password-form .form-label {
+  color: #e2e8f0;
+}
+
+.portal-password-form .form-control {
+  background: var(--bg-primary, #ffffff);
+  border: 1.5px solid #cbd5e1;
+  color: var(--text-primary, #0a2342);
+  border-radius: 6px;
+  padding: 0.7rem 0.95rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.portal-password-form .form-control::placeholder {
+  color: #64748b;
+  opacity: 0.9;
+}
+
+[data-theme="dark"] .portal-password-form .form-control {
+  background: #060913;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .portal-password-form .form-control::placeholder {
+  color: #94a3b8;
+}
+
+.portal-password-form .form-control:focus {
+  border-color: #c5a880;
+  background: var(--bg-primary, #ffffff);
+  color: var(--text-primary, #0a2342);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(197, 168, 128, 0.25);
+}
+
+[data-theme="dark"] .portal-password-form .form-control:focus {
+  background: #060913;
+  color: #f8fafc;
+  box-shadow: 0 0 0 3px rgba(197, 168, 128, 0.35);
+}
+
+.portal-success-badge {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid #10b981;
+  color: #34d399;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* User Management Action Buttons & Modals */
+.user-action-buttons {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.btn-action-edit {
+  background: rgba(197, 168, 128, 0.15);
+  border: 1px solid rgba(197, 168, 128, 0.4);
+  color: #e2d2b8;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-action-edit:hover {
+  background: rgba(197, 168, 128, 0.3);
+  color: #ffd700;
+  border-color: #ffd700;
+}
+
+.btn-action-delete {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-action-delete:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
+.user-manage-modal-card {
+  max-width: 500px;
+  width: 92%;
+  padding: 24px;
+  background: #081226;
+  border: 1px solid rgba(197, 168, 128, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.75);
+}
+
+.role-badge-super {
+  background: rgba(212, 175, 55, 0.2);
+  color: #ffd700;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  font-weight: 700;
+}
+
+/* Edit Case Modal Card Styles */
+.edit-case-modal-card {
+  max-width: 650px;
+  width: 92%;
+  padding: 24px;
+  background: var(--bg-primary, #ffffff);
+  border: 1px solid var(--border-glass, #cbd5e1);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+  color: var(--text-primary, #0a2342);
+}
+
+[data-theme="dark"] .edit-case-modal-card {
+  background: #081226;
+  border-color: rgba(197, 168, 128, 0.3);
+  color: #f8fafc;
+}
+
+.edit-case-modal-card .form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin-bottom: 0.35rem;
+}
+
+[data-theme="dark"] .edit-case-modal-card .form-label {
+  color: #e2e8f0;
+}
+
+.edit-case-modal-card .form-control {
+  background: var(--bg-secondary, #f8fafc);
+  border: 1.5px solid #cbd5e1;
+  color: var(--text-primary, #0a2342);
+  border-radius: 6px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .edit-case-modal-card .form-control {
+  background: #060913;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+}
+
+.edit-case-modal-card .form-control:focus {
+  border-color: #c5a880;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(197, 168, 128, 0.25);
+}
+
+/* Lawyer Profile Self-Completion Styles */
+.profile-progress-card {
+  padding: 20px;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+}
+
+.profile-progress-track {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 12px 0 8px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #c5a880, #ffd700);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chip-group-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chip-badge-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.chip-badge-btn:hover {
+  border-color: #c5a880;
+  color: #ffffff;
+}
+
+.chip-badge-btn.active {
+  background: rgba(197, 168, 128, 0.2);
+  border-color: #c5a880;
+  color: #ffd700;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(197, 168, 128, 0.25);
+}
+
+.status-banner-card {
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  line-height: 1.5;
+}
+
+.status-banner-card.published {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1.5px solid rgba(34, 197, 94, 0.35);
+  color: #4ade80;
+}
+
+.status-banner-card.pending_review {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+.status-banner-card.rejected {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+.status-banner-card.incomplete {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1.5px solid rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+}
+
+.pending-count-pill {
+  background: #f59e0b;
+  color: #040814;
+  padding: 1px 7px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  margin-left: 6px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.lawyer-filter-tabs-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.lawyer-filter-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.lawyer-filter-btn:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.lawyer-filter-btn.active {
+  background: rgba(197, 168, 128, 0.15);
+  border-color: #c5a880;
+  color: #ffd700;
+}
+

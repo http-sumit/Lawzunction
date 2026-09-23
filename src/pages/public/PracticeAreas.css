@@ -1,0 +1,88 @@
+.practices-hero {
+  padding: 8rem 0 4rem 0;
+  background: linear-gradient(to bottom, rgba(212, 175, 55, 0.05), transparent);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.practices-hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.practices-hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 2.5rem;
+}
+
+.practices-search-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1.5rem;
+  border-color: var(--border-glass-hover);
+}
+
+.search-icon {
+  color: var(--accent-gold);
+}
+
+.practices-search-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0.5rem 0;
+}
+
+.practices-search-input:focus {
+  outline: none;
+}
+
+/* Practice Categories */
+.practice-category-group {
+  margin-bottom: 4rem;
+}
+
+.practice-category-group:last-child {
+  margin-bottom: 0;
+}
+
+.category-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.75rem;
+  border-left: 3px solid var(--accent-gold);
+  padding-left: 0.75rem;
+}
+
+.practice-listing-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.practice-name-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.practice-name-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.py-5 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}

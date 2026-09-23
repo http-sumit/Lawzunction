@@ -1,0 +1,42 @@
+# Environment variables (Never commit real secrets)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Dependencies
+node_modules/
+server/node_modules/
+
+# Production build output & cache
+dist/
+build/
+.cache/
+.eslintcache/
+.vite/
+
+# Deployment provider metadata
+.vercel
+.render
+
+# Secrets & Keys
+*.pem
+*.key
+*.cert
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Editor & OS metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Internal Architecture & Handoff Docs (Never push to remote GitHub)
+PROJECT_HANDOFF.md
+*HANDOFF*.md
+AUDIT_REPORT.md
+*AUDIT*.md

@@ -1,0 +1,181 @@
+.directory-hero {
+  padding: 8rem 0 4rem 0;
+  background: linear-gradient(to bottom, rgba(212, 175, 55, 0.05), transparent);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.directory-hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.directory-hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Filter ribbon */
+.directory-filters-section {
+  margin-top: -2.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.filters-ribbon-card {
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  border-color: var(--border-glass-hover);
+  background: var(--bg-secondary);
+}
+
+.filter-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-glass);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+}
+
+.filter-input-group.search-bar {
+  flex: 1.5;
+  min-width: 250px;
+}
+
+.filter-input-field {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.filter-input-field:focus {
+  outline: none;
+}
+
+.filter-select-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  flex: 2;
+  justify-content: flex-end;
+}
+
+.filter-dropdown {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.filter-dropdown option {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+@media (max-width: 992px) {
+  .filters-ribbon-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filter-select-row {
+    justify-content: flex-start;
+  }
+}
+
+/* Lawyer Cards */
+.lawyer-profile-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  gap: 0.75rem;
+}
+
+.lawyer-avatar-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-glass-hover);
+  box-shadow: var(--shadow-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  transition: transform var(--transition-normal);
+}
+
+.lawyer-profile-card:hover .lawyer-avatar-circle {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-glow-strong);
+}
+
+.lawyer-card-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.lawyer-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lawyer-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.lawyer-meta-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.lawyer-card-specializations {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-grow: 1;
+}
+
+.spec-label-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  border-radius: 4px;
+}
+
+.lawyer-card-footer {
+  margin-top: 1rem;
+  width: 100%;
+  border-top: 1px solid var(--border-glass);
+  padding-top: 0.75rem;
+}

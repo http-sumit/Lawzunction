@@ -1,0 +1,111 @@
+.legal-docs-page {
+  padding: 8rem 0 4rem 0;
+  background: radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.04) 0%, transparent 60%);
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+.legal-container {
+  max-width: 900px;
+}
+
+.legal-card-outer {
+  padding: 3.5rem;
+  background-color: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+}
+
+.legal-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.legal-meta {
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+  font-weight: 600;
+  margin-bottom: 2.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.legal-section {
+  margin-bottom: 2.5rem;
+}
+
+.legal-section h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 0.5rem;
+}
+
+.legal-section p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.legal-section ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legal-section li {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.legal-link {
+  color: var(--accent-gold);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.legal-link:hover {
+  color: var(--accent-gold-hover);
+}
+
+/* Disclaimer specific style */
+.disclaimer-alert-card {
+  background: rgba(212, 175, 55, 0.05);
+  border-left: 4px solid var(--accent-gold);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+}
+
+.disclaimer-alert-card p {
+  margin-bottom: 0;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.disclaimer-view .legal-section ul {
+  list-style-type: square;
+}
+
+@media (max-width: 768px) {
+  .legal-docs-page {
+    padding: 6rem 0 3rem 0;
+  }
+  
+  .legal-card-outer {
+    padding: 2rem 1.5rem;
+  }
+
+  .legal-title {
+    font-size: 1.85rem;
+  }
+}

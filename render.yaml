@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: lawzunction-backend
+    env: node
+    plan: free
+    region: singapore
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        value: https://lawzunction.in,https://www.lawzunction.in
+      - key: FRONTEND_URL
+        value: https://lawzunction.in
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        value: Lawzunction Legal <noreply@lawzunction.in>
+      - key: ADMIN_NOTIFICATION_EMAIL
+        value: lawzunction@gmail.com

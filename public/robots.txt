@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /portal
+Disallow: /reset-password
+Disallow: /forgot-password
+
+Sitemap: https://www.lawzunction.in/sitemap.xml
+
+Host: www.lawzunction.in

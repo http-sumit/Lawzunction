@@ -1,0 +1,152 @@
+.contact-hero {
+  padding: 8rem 0 4rem 0;
+  background: linear-gradient(to bottom, rgba(212, 175, 55, 0.05), transparent);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.contact-hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.contact-hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--accent-gold);
+  font-weight: 500;
+}
+
+.contact-intro {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.office-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+}
+
+.office-tab-btn {
+  padding: 0.6rem 1.2rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.office-tab-btn.active, .office-tab-btn:hover {
+  color: var(--accent-gold);
+  border-bottom-color: var(--accent-gold);
+}
+
+.office-details-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.detail-row h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.detail-row p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.15rem;
+}
+
+.email-link {
+  color: var(--accent-gold);
+  text-decoration: underline;
+}
+
+/* Google Map Container */
+.google-map-container {
+  height: 300px;
+  position: relative;
+  border-color: var(--border-glass);
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+/* Intake Form styles */
+.form-outer-card {
+  margin-bottom: 1.5rem;
+}
+
+.form-panel-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--accent-gold);
+}
+
+.form-panel-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.intake-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.intake-success-state {
+  padding: 3rem 1.5rem;
+}
+
+.success-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--color-success);
+  margin: 0 auto 1.5rem auto;
+}
+
+.intake-success-state h4 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.intake-success-state p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.emergency-hotline-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-color: var(--color-error);
+  background: rgba(231, 76, 60, 0.05);
+}
+
+.emergency-hotline-card h5 {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.emergency-hotline-card p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
