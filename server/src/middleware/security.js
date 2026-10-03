@@ -130,10 +130,10 @@ export const configureHelmet = () => {
   });
 };
 
-// Global API Rate Limiting
+// Global API Rate Limiting (Increased limit for rich SPA navigation and real-time updates)
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Max 100 requests per 15 min window per IP
+  max: 1000, // Max 1000 requests per 15 min window per IP
   standardHeaders: true,
   legacyHeaders: false,
   message: {

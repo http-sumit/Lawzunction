@@ -225,17 +225,17 @@ router.post('/appointments/book', submissionLimiter, async (req, res) => {
       bookingObj.lawyer = lawyer || lawyerName;
     }
 
-    // Send confirmation email to client AND compulsory notification to Lawzunction
-    try {
-      const emailRes = await sendBookingEmail(bookingObj);
-      if (!emailRes.success) {
-        console.warn('⚠️ [Client Booking Dispatch Notice]:', emailRes.error || emailRes.reason || 'Email dispatch had warnings');
-      }
-    } catch (emailErr) {
-      console.error('⚠️ Failed to dispatch client booking email via Resend:', emailErr.message || emailErr);
-    }
+    // Send confirmation email to client AND compulsory notification to Lawzunction (Non-blocking)
+    sendBookingEmail(bookingObj)
+      .then(emailRes => {
+        if (emailRes && !emailRes.success) {
+          console.warn('⚠️ [Client Booking Dispatch Notice]:', emailRes.error || emailRes.reason || 'Email dispatch had warnings');
+        }
+      })
+      .catch(emailErr => console.error('⚠️ Failed to dispatch client booking email via Resend:', emailErr.message || emailErr));
 
-    await logActivity(req.user.id, 'Book Appointment', `Scheduled consultation for ${date}`);
+    logActivity(req.user.id, 'Book Appointment', `Scheduled consultation for ${date}`)
+      .catch(err => console.error('Activity log error (non-critical):', err));
 
     return res.status(201).json({ success: true, booking: bookingObj });
   } catch (error) {
@@ -275,15 +275,17 @@ router.post('/enquiries/submit', submissionLimiter, async (req, res) => {
     });
 
     const enquiryObj = newEnquiry.toJSON();
-    try {
-      const emailRes = await sendEnquiryAdminEmail(enquiryObj);
-      if (!emailRes.success) {
-        console.warn(`⚠️ [Client ${inquiryType} Dispatch Notice]:`, emailRes.error || emailRes.reason || 'Email dispatch had warnings');
-      }
-    } catch (emailErr) {
-      console.error('⚠️ Failed to dispatch client enquiry email via Resend:', emailErr.message || emailErr);
-    }
-    await logActivity(req.user.id, 'Submit Client Enquiry', `Sent message: ${subject}`);
+    // Non-blocking admin notification
+    sendEnquiryAdminEmail(enquiryObj)
+      .then(emailRes => {
+        if (emailRes && !emailRes.success) {
+          console.warn(`⚠️ [Client ${inquiryType} Dispatch Notice]:`, emailRes.error || emailRes.reason || 'Email dispatch had warnings');
+        }
+      })
+      .catch(emailErr => console.error('⚠️ Failed to dispatch client enquiry email via Resend:', emailErr.message || emailErr));
+
+    logActivity(req.user.id, 'Submit Client Enquiry', `Sent message: ${subject}`)
+      .catch(err => console.error('Activity log error (non-critical):', err));
 
     return res.status(201).json({ success: true, enquiry: enquiryObj });
   } catch (error) {

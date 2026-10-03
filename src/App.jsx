@@ -26,7 +26,7 @@ const BookingModal = lazy(() => import('./components/common/BookingModal'));
 import './App.css';
 
 function AppContent() {
-  const { currentRoute } = useContext(AppContext);
+  const { currentRoute, isServerWaking } = useContext(AppContext);
 
   useEffect(() => {
     let title = "Lawzunction | Strategic Corporate Law Firm & Advocacy";
@@ -215,6 +215,40 @@ function AppContent() {
     <div className="app-layout">
       {/* Sticky Header */}
       <Navbar onOpenBooking={() => setBookingOpen(true)} />
+
+      {/* Render instance wake-up notification banner */}
+      {isServerWaking && (
+        <aside 
+          aria-live="polite"
+          style={{
+            background: 'linear-gradient(90deg, #07172e 0%, #1e3a8a 100%)',
+            color: '#fbbf24',
+            fontSize: '0.85rem',
+            padding: '8px 16px',
+            textAlign: 'center',
+            borderBottom: '1px solid rgba(251, 191, 36, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            zIndex: 99999
+          }}
+        >
+          <span 
+            aria-hidden="true"
+            style={{ 
+              width: '14px', 
+              height: '14px', 
+              borderRadius: '50%', 
+              border: '2px solid #fbbf24', 
+              borderTopColor: 'transparent', 
+              display: 'inline-block',
+              animation: 'spin 1s linear infinite' 
+            }} 
+          />
+          <span>Connecting to secure server... Initializing backend instance.</span>
+        </aside>
+      )}
       
       {/* Main Pages Flow with Lazy Loading Boundary */}
       <main className="main-content-flow">

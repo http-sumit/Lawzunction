@@ -28,6 +28,7 @@ import {
   sendLawyerProfileRejectedEmail
 } from '../utils/mailer.js';
 import { generateUniqueSlug } from '../utils/slug.js';
+import { logActivity } from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -35,21 +36,28 @@ const router = express.Router();
 router.use(verifyJWT);
 router.use(authorizeRoles('ADMIN', 'SUPER_ADMIN'));
 
-// GET /api/admin/dashboard-stats - Dashboard metrics
+// GET /api/admin/dashboard-stats - Dashboard metrics (Parallelized for optimal performance)
 router.get('/dashboard-stats', async (req, res) => {
   try {
-    const totalCases = await Case.countDocuments();
-    const activeCases = await Case.countDocuments({ status: 'IN_PROGRESS' });
-    const closedCases = await Case.countDocuments({ status: 'CLOSED' });
-    
-    const lawyersCount = await User.countDocuments({ role: 'LAWYER' });
-    
-    // Only count clients with at least one linked case (consistent with the Manage Users list)
-    const clientProfilesWithCases = await Case.distinct('clientId');
-    const clientsCount = clientProfilesWithCases.length;
+    const [
+      totalCases,
+      activeCases,
+      closedCases,
+      lawyersCount,
+      clientProfilesWithCases,
+      pendingAppointments,
+      newEnquiries
+    ] = await Promise.all([
+      Case.countDocuments(),
+      Case.countDocuments({ status: 'IN_PROGRESS' }),
+      Case.countDocuments({ status: 'CLOSED' }),
+      User.countDocuments({ role: 'LAWYER' }),
+      Case.distinct('clientId'),
+      Appointment.countDocuments({ status: 'PENDING' }),
+      Enquiry.countDocuments({ status: 'NEW' })
+    ]);
 
-    const pendingAppointments = await Appointment.countDocuments({ status: 'PENDING' });
-    const newEnquiries = await Enquiry.countDocuments({ status: 'NEW' });
+    const clientsCount = clientProfilesWithCases.length;
 
     return res.json({
       totalCases,
@@ -66,25 +74,26 @@ router.get('/dashboard-stats', async (req, res) => {
   }
 });
 
-// GET /api/admin/users - List users with roles (CLIENT users filtered to only those with linked cases)
+// GET /api/admin/users - List users with roles (Batched queries to eliminate N+1 latency)
 router.get('/users', async (req, res) => {
   try {
     // 1. Identify client profiles with at least one linked case
     const clientProfilesWithCases = await Case.distinct('clientId');
-    const validClientProfiles = await ClientProfile.find({ _id: { $in: clientProfilesWithCases } }).select('_id userId');
-    const clientUserIdsWithCases = validClientProfiles.map(p => p.userId);
-
-    // 2. Aggregate case counts per client profile
-    const caseCounts = await Case.aggregate([
-      { $match: { clientId: { $in: clientProfilesWithCases } } },
-      { $group: { _id: '$clientId', count: { $sum: 1 } } }
+    const [validClientProfiles, caseCounts] = await Promise.all([
+      ClientProfile.find({ _id: { $in: clientProfilesWithCases } }).select('_id userId'),
+      Case.aggregate([
+        { $match: { clientId: { $in: clientProfilesWithCases } } },
+        { $group: { _id: '$clientId', count: { $sum: 1 } } }
+      ])
     ]);
+
+    const clientUserIdsWithCases = validClientProfiles.map(p => p.userId);
     const caseCountMap = new Map();
     caseCounts.forEach(item => {
       if (item._id) caseCountMap.set(item._id.toString(), item.count);
     });
 
-    // 3. Query users: all non-clients, plus only clients who have at least one case
+    // 2. Query users: all non-clients, plus only clients who have at least one case
     const users = await User.find({
       $or: [
         { role: { $ne: 'CLIENT' } },
@@ -92,14 +101,25 @@ router.get('/users', async (req, res) => {
       ]
     }).sort({ createdAt: -1 });
 
-    const formatted = await Promise.all(users.map(async (u) => {
-      const lawyerProfile = await LawyerProfile.findOne({ userId: u._id });
-      const clientProfile = await ClientProfile.findOne({ userId: u._id });
+    // 3. Batch fetch all corresponding lawyer and client profiles in 2 single queries (avoids 2N queries)
+    const userIds = users.map(u => u._id);
+    const [lawyerProfiles, clientProfiles] = await Promise.all([
+      LawyerProfile.find({ userId: { $in: userIds } }),
+      ClientProfile.find({ userId: { $in: userIds } })
+    ]);
+
+    const lawyerMap = new Map(lawyerProfiles.map(lp => [lp.userId.toString(), lp]));
+    const clientMap = new Map(clientProfiles.map(cp => [cp.userId.toString(), cp]));
+
+    const formatted = users.map((u) => {
+      const uIdStr = u._id.toString();
+      const lawyerProfile = lawyerMap.get(uIdStr);
+      const clientProfile = clientMap.get(uIdStr);
       const designationCompany = u.designation || lawyerProfile?.title || clientProfile?.company || '';
       const clientCaseCount = clientProfile ? (caseCountMap.get(clientProfile._id.toString()) || 0) : 0;
 
       return {
-        id: u._id.toString(),
+        id: uIdStr,
         name: u.name,
         email: u.email,
         phone: u.phone,
@@ -116,7 +136,7 @@ router.get('/users', async (req, res) => {
           ...(clientProfile ? clientProfile.toJSON() : {})
         }
       };
-    }));
+    });
 
     return res.json(formatted);
   } catch (error) {
@@ -197,11 +217,8 @@ router.post('/users', async (req, res) => {
     }
 
     if (role === 'LAWYER') {
-      try {
-        await sendLawyerCredentialsEmail(email.toLowerCase(), name, password, false);
-      } catch (emailErr) {
-        console.error('⚠️ Failed to send lawyer credentials email via Resend:', emailErr.message || emailErr);
-      }
+      sendLawyerCredentialsEmail(email.toLowerCase(), name, password, false)
+        .catch(emailErr => console.error('⚠️ Failed to send lawyer credentials email via Resend:', emailErr.message || emailErr));
     }
 
     return res.status(201).json({
@@ -764,11 +781,8 @@ router.put('/lawyers/:id/approve', async (req, res) => {
 
     await profile.save();
 
-    try {
-      await sendLawyerProfileApprovedEmail(targetUser.email, targetUser.name, profile.slug);
-    } catch (emailErr) {
-      console.error('⚠️ Failed to dispatch profile approved email via Resend:', emailErr.message || emailErr);
-    }
+    sendLawyerProfileApprovedEmail(targetUser.email, targetUser.name, profile.slug)
+      .catch(emailErr => console.error('⚠️ Failed to dispatch profile approved email via Resend:', emailErr.message || emailErr));
 
     return res.json({
       success: true,
@@ -822,11 +836,8 @@ router.put('/lawyers/:id/reject', async (req, res) => {
 
     await profile.save();
 
-    try {
-      await sendLawyerProfileRejectedEmail(targetUser.email, targetUser.name, reason.trim());
-    } catch (emailErr) {
-      console.error('⚠️ Failed to dispatch profile rejection email via Resend:', emailErr.message || emailErr);
-    }
+    sendLawyerProfileRejectedEmail(targetUser.email, targetUser.name, reason.trim())
+      .catch(emailErr => console.error('⚠️ Failed to dispatch profile rejection email via Resend:', emailErr.message || emailErr));
 
     return res.json({
       success: true,
@@ -1067,41 +1078,33 @@ router.put('/cases/:caseId/assign', async (req, res) => {
     const isReassignment = Boolean(isNewAssignment && previousLawyerUser && previousLawyerProfileId);
 
     if (isNewAssignment && targetLawyerUser && targetLawyerUser.email) {
-      try {
-        const clientName = existingCase.clientId?.userId?.name || 'Firm Client';
-        const allotmentDate = new Date().toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric'
-        });
+      const clientName = existingCase.clientId?.userId?.name || 'Firm Client';
+      const allotmentDate = new Date().toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
 
-        await sendCaseAllotmentEmail({
-          lawyerEmail: targetLawyerUser.email,
-          lawyerName: targetLawyerUser.name,
-          caseNumber: existingCase.caseNumber,
-          caseTitle: existingCase.title,
-          caseType: existingCase.caseType || 'Litigation & Legal Advisory',
-          clientName,
-          caseDescription: existingCase.description || existingCase.lastUpdate || 'Legal counsel representation matter.',
-          allotmentDate,
-          hearingDateOrDeadline: existingCase.hearingDate || existingCase.deadline || 'To be scheduled / Refer to docket'
-        });
-      } catch (mailErr) {
-        console.error('⚠️ Failed to dispatch case allotment email to lawyer:', mailErr.message || mailErr);
-      }
+      sendCaseAllotmentEmail({
+        lawyerEmail: targetLawyerUser.email,
+        lawyerName: targetLawyerUser.name,
+        caseNumber: existingCase.caseNumber,
+        caseTitle: existingCase.title,
+        caseType: existingCase.caseType || 'Litigation & Legal Advisory',
+        clientName,
+        caseDescription: existingCase.description || existingCase.lastUpdate || 'Legal counsel representation matter.',
+        allotmentDate,
+        hearingDateOrDeadline: existingCase.hearingDate || existingCase.deadline || 'To be scheduled / Refer to docket'
+      }).catch(mailErr => console.error('⚠️ Failed to dispatch case allotment email to lawyer:', mailErr.message || mailErr));
 
       // If re-assigned from another lawyer, notify previous lawyer of removal
       if (isReassignment && previousLawyerUser.email) {
-        try {
-          await sendCaseUnassignedEmail({
-            lawyerEmail: previousLawyerUser.email,
-            lawyerName: previousLawyerUser.name,
-            caseNumber: existingCase.caseNumber,
-            caseTitle: existingCase.title
-          });
-        } catch (prevMailErr) {
-          console.error('⚠️ Failed to dispatch removal notice to previous lawyer:', prevMailErr.message || prevMailErr);
-        }
+        sendCaseUnassignedEmail({
+          lawyerEmail: previousLawyerUser.email,
+          lawyerName: previousLawyerUser.name,
+          caseNumber: existingCase.caseNumber,
+          caseTitle: existingCase.title
+        }).catch(prevMailErr => console.error('⚠️ Failed to dispatch removal notice to previous lawyer:', prevMailErr.message || prevMailErr));
       }
     }
 
@@ -1187,40 +1190,32 @@ router.put('/cases/:caseId', async (req, res) => {
     const isReassignment = Boolean(isNewAssignment && previousLawyerUser && previousLawyerProfileId);
 
     if (isNewAssignment && targetLawyerUser && targetLawyerUser.email) {
-      try {
-        const clientName = existingCase.clientId?.userId?.name || 'Firm Client';
-        const allotmentDate = new Date().toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric'
-        });
+      const clientName = existingCase.clientId?.userId?.name || 'Firm Client';
+      const allotmentDate = new Date().toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
 
-        await sendCaseAllotmentEmail({
-          lawyerEmail: targetLawyerUser.email,
-          lawyerName: targetLawyerUser.name,
-          caseNumber: existingCase.caseNumber,
-          caseTitle: existingCase.title,
-          caseType: existingCase.caseType || 'Litigation & Legal Advisory',
-          clientName,
-          caseDescription: existingCase.description || existingCase.lastUpdate || 'Legal counsel representation matter.',
-          allotmentDate,
-          hearingDateOrDeadline: existingCase.hearingDate || existingCase.deadline || 'To be scheduled / Refer to docket'
-        });
-      } catch (mailErr) {
-        console.error('⚠️ Failed to dispatch case allotment email to lawyer:', mailErr.message || mailErr);
-      }
+      sendCaseAllotmentEmail({
+        lawyerEmail: targetLawyerUser.email,
+        lawyerName: targetLawyerUser.name,
+        caseNumber: existingCase.caseNumber,
+        caseTitle: existingCase.title,
+        caseType: existingCase.caseType || 'Litigation & Legal Advisory',
+        clientName,
+        caseDescription: existingCase.description || existingCase.lastUpdate || 'Legal counsel representation matter.',
+        allotmentDate,
+        hearingDateOrDeadline: existingCase.hearingDate || existingCase.deadline || 'To be scheduled / Refer to docket'
+      }).catch(mailErr => console.error('⚠️ Failed to dispatch case allotment email to lawyer:', mailErr.message || mailErr));
 
       if (isReassignment && previousLawyerUser.email) {
-        try {
-          await sendCaseUnassignedEmail({
-            lawyerEmail: previousLawyerUser.email,
-            lawyerName: previousLawyerUser.name,
-            caseNumber: existingCase.caseNumber,
-            caseTitle: existingCase.title
-          });
-        } catch (prevMailErr) {
-          console.error('⚠️ Failed to dispatch removal notice to previous lawyer:', prevMailErr.message || prevMailErr);
-        }
+        sendCaseUnassignedEmail({
+          lawyerEmail: previousLawyerUser.email,
+          lawyerName: previousLawyerUser.name,
+          caseNumber: existingCase.caseNumber,
+          caseTitle: existingCase.title
+        }).catch(prevMailErr => console.error('⚠️ Failed to dispatch removal notice to previous lawyer:', prevMailErr.message || prevMailErr));
       }
     }
 
@@ -1346,16 +1341,17 @@ router.delete(['/job-applications/:id', '/careers/:id', '/careers/applications/:
       return res.status(404).json({ message: 'Career application not found' });
     }
 
-    await logActivity(
+    // Non-blocking activity log — must never prevent success response
+    logActivity(
       req.user.id,
       'Delete Career Application',
       `Deleted application from ${app.name} (${app.email}) for position ${app.jobTitle}`
-    );
+    ).catch(err => console.error('Activity log error (non-critical):', err));
 
-    return res.json({ success: true, message: 'Career application deleted successfully' });
+    return res.status(200).json({ success: true, message: 'Career application deleted successfully' });
   } catch (error) {
     console.error('Delete application error:', error);
-    return res.status(500).json({ message: 'Failed to delete application' });
+    return res.status(500).json({ success: false, message: 'Failed to delete application' });
   }
 });
 
@@ -1379,12 +1375,10 @@ router.put('/users/:id/reset-password', async (req, res) => {
     targetUser.mustChangePassword = true;
     await targetUser.save();
 
-    try {
-      await sendLawyerCredentialsEmail(targetUser.email, targetUser.name, temporaryPassword, true);
-    } catch (emailErr) {
-      console.error('⚠️ Failed to send reset lawyer credentials email via Resend:', emailErr.message || emailErr);
-    }
-    await logActivity(req.user.id, 'Admin Reset Password', `Admin reset password for user ${id}`);
+    sendLawyerCredentialsEmail(targetUser.email, targetUser.name, temporaryPassword, true)
+      .catch(emailErr => console.error('⚠️ Failed to send reset lawyer credentials email via Resend:', emailErr.message || emailErr));
+    logActivity(req.user.id, 'Admin Reset Password', `Admin reset password for user ${id}`)
+      .catch(err => console.error('Activity log error (non-critical):', err));
 
     return res.json({
       success: true,

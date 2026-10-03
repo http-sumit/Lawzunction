@@ -4,7 +4,6 @@ import Appointment from '../models/Appointment.js';
 import Enquiry from '../models/Enquiry.js';
 import JobApplication from '../models/JobApplication.js';
 import Newsletter from '../models/Newsletter.js';
-import User from '../models/User.js';
 import LawyerProfile from '../models/LawyerProfile.js';
 import Blog from '../models/Blog.js';
 import PracticeArea from '../models/PracticeArea.js';
@@ -13,7 +12,6 @@ import { handleResumeUpload } from '../middleware/upload.js';
 import { 
   sendBookingEmail, 
   sendEnquiryAdminEmail, 
-  sendNewsletterWelcomeEmail, 
   sendNewsletterSubscriptionEmails,
   sendBriefingsSubscriptionEmails,
   sendAppointmentConfirmedEmail, 
@@ -82,15 +80,14 @@ router.post('/bookings', submissionLimiter, async (req, res) => {
       bookingObj.lawyer = lawyer || lawyerName;
     }
 
-    // Send email to client AND compulsory notification to Lawzunction admin/lawyer
-    try {
-      const emailRes = await sendBookingEmail(bookingObj);
-      if (!emailRes.success) {
-        console.warn('⚠️ [Booking Dispatch Notice]:', emailRes.error || emailRes.reason || 'Email dispatch had warnings');
-      }
-    } catch (emailErr) {
-      console.error('⚠️ Failed to dispatch booking email via Resend:', emailErr.message || emailErr);
-    }
+    // Non-blocking email dispatch to client and admin
+    sendBookingEmail(bookingObj)
+      .then(emailRes => {
+        if (emailRes && !emailRes.success) {
+          console.warn('⚠️ [Booking Dispatch Notice]:', emailRes.error || emailRes.reason || 'Email dispatch had warnings');
+        }
+      })
+      .catch(emailErr => console.error('⚠️ Failed to dispatch booking email via Resend:', emailErr.message || emailErr));
 
     return res.status(201).json({
       success: true,
@@ -189,14 +186,14 @@ router.post('/leads', submissionLimiter, async (req, res) => {
     });
 
     const enquiryObj = newEnquiry.toJSON();
-    try {
-      const emailRes = await sendEnquiryAdminEmail(enquiryObj);
-      if (!emailRes.success) {
-        console.warn(`⚠️ [${enquiryObj.type} Dispatch Notice]:`, emailRes.error || emailRes.reason || 'Email dispatch had warnings');
-      }
-    } catch (emailErr) {
-      console.error('⚠️ Failed to dispatch enquiry email via Resend:', emailErr.message || emailErr);
-    }
+    // Non-blocking email dispatch to admin
+    sendEnquiryAdminEmail(enquiryObj)
+      .then(emailRes => {
+        if (emailRes && !emailRes.success) {
+          console.warn(`⚠️ [${enquiryObj.type} Dispatch Notice]:`, emailRes.error || emailRes.reason || 'Email dispatch had warnings');
+        }
+      })
+      .catch(emailErr => console.error('⚠️ Failed to dispatch enquiry email via Resend:', emailErr.message || emailErr));
 
     return res.status(201).json({
       success: true,
@@ -290,15 +287,14 @@ router.post(['/jobs/apply', '/careers/apply'], submissionLimiter, handleResumeUp
       });
     }
 
-    // Dispatch career application email to lawzunction@gmail.com with actual resume attached, and confirmation to candidate
-    try {
-      const emailRes = await sendCareerApplicationEmail(appObj, attachments);
-      if (!emailRes.success) {
-        console.warn('⚠️ [Career Dispatch Notice]:', emailRes.error || emailRes.reason || 'Email dispatch had warnings');
-      }
-    } catch (emailErr) {
-      console.error('⚠️ Failed to dispatch career application email via Resend:', emailErr.message || emailErr);
-    }
+    // Non-blocking dispatch of career application email to admin and confirmation to candidate
+    sendCareerApplicationEmail(appObj, attachments)
+      .then(emailRes => {
+        if (emailRes && !emailRes.success) {
+          console.warn('⚠️ [Career Dispatch Notice]:', emailRes.error || emailRes.reason || 'Email dispatch had warnings');
+        }
+      })
+      .catch(emailErr => console.error('⚠️ Failed to dispatch career application email via Resend:', emailErr.message || emailErr));
 
     return res.status(201).json({
       success: true,
@@ -353,21 +349,23 @@ router.post('/newsletter/subscribe', submissionLimiter, async (req, res) => {
       await subscriber.save();
     }
 
-    // Trigger dedicated subscription emails based on type
-    let emailRes;
+    // Non-blocking trigger of dedicated subscription emails
     if (subscriptionType === 'Briefings') {
-      emailRes = await sendBriefingsSubscriptionEmails({ email: cleanEmail, name: cleanName, phone: cleanPhone });
+      sendBriefingsSubscriptionEmails({ email: cleanEmail, name: cleanName, phone: cleanPhone })
+        .then(emailRes => {
+          if (emailRes && !emailRes.success) {
+            console.warn(`⚠️ [Briefings Subscription Notice]:`, emailRes.error || 'Failed to dispatch email');
+          }
+        })
+        .catch(err => console.error('⚠️ [Briefings Subscription Error]:', err));
     } else {
-      emailRes = await sendNewsletterSubscriptionEmails({ email: cleanEmail, name: cleanName, phone: cleanPhone });
-    }
-
-    if (!emailRes.success) {
-      console.error(`❌ [${subscriptionType} Subscription Error]:`, emailRes.error || 'Failed to dispatch email');
-      return res.status(502).json({
-        success: false,
-        message: `Subscription recorded, but email confirmation failed: ${emailRes.error?.message || emailRes.error || 'Resend API error'}`,
-        error: emailRes.error
-      });
+      sendNewsletterSubscriptionEmails({ email: cleanEmail, name: cleanName, phone: cleanPhone })
+        .then(emailRes => {
+          if (emailRes && !emailRes.success) {
+            console.warn(`⚠️ [Newsletter Subscription Notice]:`, emailRes.error || 'Failed to dispatch email');
+          }
+        })
+        .catch(err => console.error('⚠️ [Newsletter Subscription Error]:', err));
     }
 
     return res.status(200).json({
@@ -422,17 +420,14 @@ router.post('/briefings/subscribe', submissionLimiter, async (req, res) => {
       await subscriber.save();
     }
 
-    // Await dedicated briefings email
-    const emailRes = await sendBriefingsSubscriptionEmails({ email: cleanEmail, name: cleanName, phone: cleanPhone });
-
-    if (!emailRes.success) {
-      console.error('❌ [Briefings Subscription Error]:', emailRes.error || 'Failed to dispatch email');
-      return res.status(502).json({
-        success: false,
-        message: `Subscription recorded, but briefings welcome email failed: ${emailRes.error?.message || emailRes.error || 'Resend API error'}`,
-        error: emailRes.error
-      });
-    }
+    // Non-blocking dedicated briefings email
+    sendBriefingsSubscriptionEmails({ email: cleanEmail, name: cleanName, phone: cleanPhone })
+      .then(emailRes => {
+        if (emailRes && !emailRes.success) {
+          console.warn('⚠️ [Briefings Subscription Notice]:', emailRes.error || 'Failed to dispatch email');
+        }
+      })
+      .catch(err => console.error('⚠️ [Briefings Subscription Error]:', err));
 
     return res.status(200).json({
       success: true,
@@ -534,6 +529,7 @@ router.get('/lawyers', async (req, res) => {
     const startIndex = (pageNum - 1) * pageSize;
     const paginatedList = list.slice(startIndex, startIndex + pageSize);
 
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     res.setHeader('X-Total-Count', String(total));
     res.setHeader('X-Page', String(pageNum));
     res.setHeader('X-Total-Pages', String(totalPages));
@@ -579,6 +575,7 @@ router.get('/lawyers/:slugOrId', async (req, res) => {
       return res.status(404).json({ message: 'Advocate profile not found or is currently not published.' });
     }
 
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     return res.json({
       id: profile._id.toString(),
       userId: profile.userId._id.toString(),
@@ -606,6 +603,7 @@ router.get('/lawyers/:slugOrId', async (req, res) => {
 router.get('/blogs', async (req, res) => {
   try {
     const blogs = await Blog.find({ published: true }).sort({ createdAt: -1 });
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     return res.json(blogs.map(b => b.toJSON()));
   } catch (error) {
     console.error('Load public blogs error:', error);
@@ -617,6 +615,7 @@ router.get('/blogs', async (req, res) => {
 router.get('/practice-areas', async (req, res) => {
   try {
     const areas = await PracticeArea.find();
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     return res.json(areas.map(a => a.toJSON()));
   } catch (error) {
     console.error('Load public practice areas error:', error);

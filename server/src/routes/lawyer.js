@@ -114,18 +114,14 @@ router.put('/cases/:caseId/status', async (req, res) => {
         message: `Your active case "${caseRecord.title}" was updated to: ${caseRecord.status} (${caseRecord.progress}% completed).`
       });
 
-      try {
-        await sendCaseUpdateEmail(
-          clientUser.email,
-          clientUser.name,
-          caseRecord.title,
-          caseRecord.status,
-          caseRecord.progress,
-          lastUpdate
-        );
-      } catch (emailErr) {
-        console.error('⚠️ Failed to dispatch case update email via Resend:', emailErr.message || emailErr);
-      }
+      sendCaseUpdateEmail(
+        clientUser.email,
+        clientUser.name,
+        caseRecord.title,
+        caseRecord.status,
+        caseRecord.progress,
+        lastUpdate
+      ).catch(emailErr => console.error('⚠️ Failed to dispatch case update email via Resend:', emailErr.message || emailErr));
     }
 
     await logActivity(req.user.id, 'Update Case Status', `Updated progress of case ${caseId} to ${progress}%`);
@@ -552,19 +548,15 @@ router.post('/profile/submit', async (req, res) => {
     await profile.save();
 
     // Dispatch email notification to admin (lawzunction@gmail.com)
-    try {
-      await sendLawyerProfileSubmittedAdminEmail({
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        barCouncilNumber: profile.barCouncilNumber,
-        specializations: profile.specializations,
-        experience: profile.experience,
-        city: profile.city
-      });
-    } catch (emailErr) {
-      console.error('⚠️ Failed to dispatch admin profile submission notice via Resend:', emailErr.message || emailErr);
-    }
+    sendLawyerProfileSubmittedAdminEmail({
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      barCouncilNumber: profile.barCouncilNumber,
+      specializations: profile.specializations,
+      experience: profile.experience,
+      city: profile.city
+    }).catch(emailErr => console.error('⚠️ Failed to dispatch admin profile submission notice via Resend:', emailErr.message || emailErr));
 
     return res.json({
       success: true,

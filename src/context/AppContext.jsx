@@ -336,6 +336,7 @@ export const AppProvider = ({ children }) => {
   ];
 
   const [lawyers, setLawyers] = useState(initialLawyers);
+  const [isServerWaking, setIsServerWaking] = useState(false);
 
   const fetchPublicLawyers = async () => {
     try {
@@ -344,7 +345,7 @@ export const AppProvider = ({ children }) => {
         const data = await res.json();
         const publishedArray = Array.isArray(data) ? data : (data.lawyers || []);
         if (publishedArray.length > 0) {
-          setLawyers(prev => {
+          setLawyers(() => {
             const map = new Map();
             // Retain existing rich mock data if present
             initialLawyers.forEach(l => {
@@ -646,86 +647,78 @@ export const AppProvider = ({ children }) => {
   const [adminEnquiries, setAdminEnquiries] = useState([]);
   const [adminJobApplications, setAdminJobApplications] = useState([]);
 
-  // Master helper to load private dashboard details based on role
+  // Master helper to load private dashboard details based on role (Parallelized for rapid paint)
   const loadPortalData = async (token, role, userObj = null) => {
     const headers = { 'Authorization': `Bearer ${token}` };
+    const safeFetch = (url) => fetch(url, { headers })
+      .then(res => res.ok ? res.json().catch(() => null) : null)
+      .catch(err => {
+        console.warn(`Portal fetch notice for ${url}:`, err.message || err);
+        return null;
+      });
+
     try {
       if (role === 'CLIENT') {
-        const casesRes = await fetch('/api/client/cases', { headers });
-        if (casesRes.ok) {
-          const casesData = await casesRes.json();
-          setPortalCases(Array.isArray(casesData) ? casesData : (casesData.data || []));
-        }
+        const [casesData, apptsData, invoicesData, docsData, msgsData, noticeData] = await Promise.all([
+          safeFetch('/api/client/cases'),
+          safeFetch('/api/client/appointments'),
+          safeFetch('/api/client/invoices'),
+          safeFetch('/api/client/documents'),
+          safeFetch('/api/client/messages'),
+          safeFetch('/api/client/notifications')
+        ]);
 
-        const apptsRes = await fetch('/api/client/appointments', { headers });
-        if (apptsRes.ok) setBookings(await apptsRes.json());
-
-        const invoicesRes = await fetch('/api/client/invoices', { headers });
-        if (invoicesRes.ok) setPortalInvoices(await invoicesRes.json());
-
-        const docsRes = await fetch('/api/client/documents', { headers });
-        if (docsRes.ok) {
-          const docsData = await docsRes.json();
-          setPortalDocuments(Array.isArray(docsData) ? docsData : (docsData.data || []));
-        }
-
-        const msgsRes = await fetch('/api/client/messages', { headers });
-        if (msgsRes.ok) setPortalMessages(await msgsRes.json());
-
-        const noticeRes = await fetch('/api/client/notifications', { headers });
-        if (noticeRes.ok) setNotifications(await noticeRes.json());
+        if (casesData) setPortalCases(Array.isArray(casesData) ? casesData : (casesData.data || []));
+        if (apptsData) setBookings(apptsData);
+        if (invoicesData) setPortalInvoices(invoicesData);
+        if (docsData) setPortalDocuments(Array.isArray(docsData) ? docsData : (docsData.data || []));
+        if (msgsData) setPortalMessages(msgsData);
+        if (noticeData) setNotifications(noticeData);
       } 
-      
       else if (role === 'LAWYER') {
-        const casesRes = await fetch('/api/lawyer/cases', { headers });
-        if (casesRes.ok) {
-          const casesData = await casesRes.json();
-          setLawyerCases(Array.isArray(casesData) ? casesData : (casesData.data || []));
-        }
+        const [casesData, apptsData] = await Promise.all([
+          safeFetch('/api/lawyer/cases'),
+          safeFetch('/api/lawyer/appointments')
+        ]);
 
-        const apptsRes = await fetch('/api/lawyer/appointments', { headers });
-        if (apptsRes.ok) setLawyerAppointments(await apptsRes.json());
+        if (casesData) setLawyerCases(Array.isArray(casesData) ? casesData : (casesData.data || []));
+        if (apptsData) setLawyerAppointments(apptsData);
       } 
-      
       else if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-        const statsRes = await fetch('/api/admin/dashboard-stats', { headers });
-        if (statsRes.ok) setAdminStats(await statsRes.json());
-
-        const usersRes = await fetch('/api/admin/users', { headers });
-        if (usersRes.ok) setAdminUsers(await usersRes.json());
-
-        const lawyersRes = await fetch('/api/admin/lawyers', { headers });
-        if (lawyersRes.ok) setAdminLawyers(await lawyersRes.json());
-
-        const casesRes = await fetch('/api/admin/cases', { headers });
-        if (casesRes.ok) {
-          const casesData = await casesRes.json();
-          setAdminCases(Array.isArray(casesData) ? casesData : (casesData.data || []));
-        }
-
-        const enquiriesRes = await fetch('/api/admin/enquiries', { headers });
-        if (enquiriesRes.ok) setAdminEnquiries(await enquiriesRes.json());
-
-        const jobsRes = await fetch('/api/admin/job-applications', { headers });
-        if (jobsRes.ok) {
-          const jobsData = await jobsRes.json();
-          setAdminJobApplications(Array.isArray(jobsData) ? jobsData : (jobsData.data || []));
-        }
-
-        // If this admin also has a linked lawyer profile, fetch their assigned cases and consultations
         const hasLawyerProfile = Boolean(
           (userObj && (userObj.lawyerProfile || userObj.lawyerProfileId)) ||
           (currentUser && (currentUser.lawyerProfile || currentUser.lawyerProfileId))
         );
-        if (hasLawyerProfile) {
-          const lawyerCasesRes = await fetch('/api/lawyer/cases', { headers });
-          if (lawyerCasesRes.ok) {
-            const lawyerCasesData = await lawyerCasesRes.json();
-            setLawyerCases(Array.isArray(lawyerCasesData) ? lawyerCasesData : (lawyerCasesData.data || []));
-          }
 
-          const lawyerApptsRes = await fetch('/api/lawyer/appointments', { headers });
-          if (lawyerApptsRes.ok) setLawyerAppointments(await lawyerApptsRes.json());
+        const [
+          statsData,
+          usersData,
+          lawyersData,
+          casesData,
+          enquiriesData,
+          jobsData,
+          lawyerCasesData,
+          lawyerApptsData
+        ] = await Promise.all([
+          safeFetch('/api/admin/dashboard-stats'),
+          safeFetch('/api/admin/users'),
+          safeFetch('/api/admin/lawyers'),
+          safeFetch('/api/admin/cases'),
+          safeFetch('/api/admin/enquiries'),
+          safeFetch('/api/admin/job-applications'),
+          hasLawyerProfile ? safeFetch('/api/lawyer/cases') : Promise.resolve(null),
+          hasLawyerProfile ? safeFetch('/api/lawyer/appointments') : Promise.resolve(null)
+        ]);
+
+        if (statsData) setAdminStats(statsData);
+        if (usersData) setAdminUsers(usersData);
+        if (lawyersData) setAdminLawyers(lawyersData);
+        if (casesData) setAdminCases(Array.isArray(casesData) ? casesData : (casesData.data || []));
+        if (enquiriesData) setAdminEnquiries(enquiriesData);
+        if (jobsData) setAdminJobApplications(Array.isArray(jobsData) ? jobsData : (jobsData.data || []));
+        if (hasLawyerProfile) {
+          if (lawyerCasesData) setLawyerCases(Array.isArray(lawyerCasesData) ? lawyerCasesData : (lawyerCasesData.data || []));
+          if (lawyerApptsData) setLawyerAppointments(lawyerApptsData);
         }
       }
     } catch (error) {
@@ -804,17 +797,28 @@ export const AppProvider = ({ children }) => {
           }
         });
     }
-    fetchPublicLawyers();
-    fetchPublicPracticeAreas();
-    fetchPublicBlogs();
+    // Render cold-start handling: track waking state if catalog fetch takes >2.5s
+    const wakingTimer = setTimeout(() => {
+      setIsServerWaking(true);
+    }, 2500);
+
+    Promise.allSettled([
+      fetchPublicLawyers(),
+      fetchPublicPracticeAreas(),
+      fetchPublicBlogs()
+    ]).finally(() => {
+      clearTimeout(wakingTimer);
+      setIsServerWaking(false);
+    });
   }, []);
 
-  // Poll secure chat message log (CLIENT only) every 4 seconds
+  // Poll secure chat message log (CLIENT only) with visibility check to avoid rate limits
   useEffect(() => {
     const token = localStorage.getItem('lawz_jwt_token');
     if (!currentUser || currentUser.role !== 'CLIENT' || !token) return;
 
-    const interval = setInterval(() => {
+    const pollMessages = () => {
+      if (typeof document !== 'undefined' && document.hidden) return; // Skip polling when tab is hidden
       fetch('/api/client/messages', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -825,7 +829,9 @@ export const AppProvider = ({ children }) => {
           if (data) setPortalMessages(data);
         })
         .catch(err => console.error('Secure messages polling error:', err));
-    }, 4000);
+    };
+
+    const interval = setInterval(pollMessages, 12000); // 12-second interval prevents rate limiter exhaustion
 
     return () => clearInterval(interval);
   }, [currentUser]);
@@ -939,7 +945,10 @@ export const AppProvider = ({ children }) => {
 
   const deleteJobApplication = async (applicationId) => {
     const token = localStorage.getItem('lawz_jwt_token');
-    if (!token) return { success: false, message: 'Authentication required' };
+    if (!token) {
+      console.error('Delete application error: No authentication token found');
+      return { success: false, message: 'Authentication required' };
+    }
 
     try {
       const res = await fetch(`/api/admin/job-applications/${applicationId}`, {
@@ -948,15 +957,16 @@ export const AppProvider = ({ children }) => {
           'Authorization': `Bearer ${token}`
         }
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setAdminJobApplications(prev => prev.filter(app => (app.id || app._id) !== applicationId));
-        return { success: true };
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && (data.success !== false)) {
+        setAdminJobApplications(prev => prev.filter(app => String(app.id || app._id) !== String(applicationId)));
+        return { success: true, message: data.message || 'Career application deleted successfully' };
       }
+      console.error('Delete job application server returned error:', res.status, data);
       return { success: false, message: data.message || 'Failed to delete application' };
     } catch (error) {
       console.error('Delete job application error:', error);
-      return { success: false, message: error.message || 'Network error' };
+      return { success: false, message: error.message || 'Network error occurred while deleting application' };
     }
   };
 
@@ -1841,6 +1851,9 @@ export const AppProvider = ({ children }) => {
       // Chat state
       chatHistory,
       isBotTyping,
+
+      // Cold start / server status
+      isServerWaking,
 
       // Actions
       addBooking,

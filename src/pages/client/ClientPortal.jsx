@@ -1137,11 +1137,17 @@ export default function ClientPortal() {
     if (!window.confirm(`Are you sure you want to permanently delete the career application from "${candidateName || 'Candidate'}"?`)) {
       return;
     }
-    const res = await deleteJobApplication(appId);
-    if (res && res.success) {
-      alert('Career application successfully deleted.');
-    } else {
-      alert(res?.message || 'Failed to delete application.');
+    try {
+      const res = await deleteJobApplication(appId);
+      if (res && res.success) {
+        alert(res.message || 'Career application successfully deleted.');
+      } else {
+        console.error('Delete career application failed:', res);
+        alert(res?.message || 'Failed to delete application.');
+      }
+    } catch (err) {
+      console.error('Unexpected error deleting career application:', err);
+      alert('Failed to delete application.');
     }
   };
 
